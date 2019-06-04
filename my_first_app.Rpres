@@ -1,0 +1,111 @@
+My Shiny App
+========================================================
+author: Jessica
+date: June 4, 2019
+autosize: false
+
+```{r, include=FALSE}
+# set up
+library(data.table)
+library(Rcpp)
+library(dplyr)
+library(readr)
+library(magrittr)
+library(lubridate)
+library(stringr)
+library(shiny)
+library(ggplot2)
+library(gridExtra)
+library(rsconnect)
+
+# Load data
+activity <- fread("./Data/fitbit_export_20190604.csv",
+                  skip = 1,
+                  nrows = 31,
+                  select = c("Date", "Steps", "Distance"),
+                  dec = ".",
+                  data.table = FALSE)
+
+sleep <- fread("./Data/fitbit_export_20190604.csv",
+               skip = 35,
+               nrows = 30,
+               select = c("End Time", "Asleep" = "Minutes Asleep"),
+               dec = ".",
+               data.table = FALSE)
+
+# Transform data
+sleep %<>% 
+  rename(Date = `End Time`, Sleep = `Minutes Asleep`) %>%
+  mutate(Date = dmy(word(Date, 1)))
+
+activity %<>% 
+  mutate_all(gsub, pattern = ",", replacement = "") %>%
+  mutate(Date = dmy(Date)) %>%
+  mutate_at(vars(-Date), as.numeric) %>%
+  left_join(sleep, by = "Date")
+
+rm(sleep)
+
+
+```
+
+Data from my activity tracker
+========================================================
+
+Hi there,
+I built a Shiny App for the Coursera assignment, wich is published for you at https://jesvisser.shinyapps.io/first_app/. The app is based on data I collected by wearing my activity tracker last month. You will get insight in
+
+- number of minutes I slept per day
+- numer of steps I took each day
+
+You can select these variables in the user interface and the will be shown in a plot.
+
+
+Plot by Date
+========================================================
+Select the date on the x-axis and you can see how I well I slept and how active I have been last month. Like in the following plot in which I show you the number of steps I took:
+
+```{r}
+ggplot(activity, aes(x = Date, y = Steps)) +
+       geom_point() + labs(title = "My steps during May 2019")
+
+```
+
+
+Plot my steps and my sleep
+========================================================
+Or select both the number of steps I took and the minutes I have been asleep. The app also offers the possibility to add a linear model to the plot. But as I found out, there isn't much correlation between the variables...
+
+```{r}
+ggplot(activity, aes(x = Sleep, y = Steps)) +
+  geom_point() +
+  geom_smooth(method ='lm')
+
+```
+
+
+And it all works because of the calculations in the server function
+========================================================
+This is what the server function looks like "in production":
+
+```{r, eval=FALSE}
+server <- function(input, output) {
+  
+  output$plot <- renderPlot({
+    
+    # Create plot
+    g <- ggplot(activity, aes_string(x = input$x, y = input$y)) +
+      geom_point() +
+      labs(title = "My steps and/or sleep during May 2019")
+    
+    # Show plot with or without linear model
+    if(input$show_lm){
+      g + geom_smooth(method ='lm')
+    } else { 
+        g 
+      }
+    
+  })
+}
+```
+

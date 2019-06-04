@@ -73,6 +73,7 @@ ui <- fluidPage(
     # Output(s)
     mainPanel(
       p("As I wear my Fitbit activity tracker, I collect data on the number of steps I take each day (Steps) and the minutes I sleep each day (Sleep). In this plot I can see how well I slept during the month May and also how active I have been. Would these 2 variables influence each other? Let's find out..."),
+      p("Select the variables for the x-axis and y-axis and the plot will be created for you. Also you can add a linear model to the plot by checking the box."),
       plotOutput("plot")
     )
   )
