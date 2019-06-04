@@ -2,6 +2,7 @@
 
 ### Set up
 library(data.table)
+library(Rcpp)
 library(dplyr)
 library(readr)
 library(magrittr)
@@ -10,22 +11,6 @@ library(stringr)
 library(shiny)
 library(ggplot2)
 library(rsconnect)
-
-### Load data ----
-activity <- fread("fitbit_export_20190604.csv",
-                  skip = 1,
-                  nrows = 31,
-                  dec = ".",
-                  data.table = FALSE)
-
-### Transform data
-activity %<>% 
-  mutate_all(gsub, pattern = ",", replacement = "") %>%
-  mutate(Date = dmy(Date)) %>%
-  mutate_at(vars(-Date), as.numeric)
-
-
-### create shiny app
 
 ### define shiny user interface ----
 ui <- fluidPage(
@@ -37,6 +22,21 @@ ui <- fluidPage(
 
 ### define shiny server function ----
 server <- function(input, output) {
+  
+  # Load data ----
+  activity <- fread("./Data/fitbit_export_20190604.csv",
+                    skip = 1,
+                    nrows = 31,
+                    dec = ".",
+                    data.table = FALSE)
+  
+  # Transform data
+  activity %<>% 
+    mutate_all(gsub, pattern = ",", replacement = "") %>%
+    mutate(Date = dmy(Date)) %>%
+    mutate_at(vars(-Date), as.numeric)
+  
+  # Create plot
   output$plot <- renderPlot({
     activity %>%
       ggplot(aes_string(x = "Date", y = input$variable)) +
@@ -47,5 +47,3 @@ server <- function(input, output) {
 
 ### shinyApp ----
 shinyApp(ui = ui, server = server)
-
-rsconnect::deployApp("C:/Users/Jessica.Visser/Documents/R scripts/first_app")
