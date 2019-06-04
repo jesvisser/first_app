@@ -81,10 +81,12 @@ ui <- fluidPage(
 ### define shiny server function ----
 server <- function(input, output) {
   
-  # Create plot
   output$plot <- renderPlot({
+    
+    # Create plot
     g <- ggplot(activity, aes_string(x = input$x, y = input$y)) +
-      geom_point()
+      geom_point() +
+      labs(title = "My steps and/or sleep during May 2019")
     
     # Show plot with or without linear model
     if(input$show_lm){
