@@ -1,0 +1,10 @@
+name: first_app
+title:
+username:
+account: jesvisser
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 964505
+bundleId: 2129457
+url: https://jesvisser.shinyapps.io/first_app/
+when: 1559658006.96935
