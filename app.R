@@ -57,11 +57,11 @@ ui <- fluidPage(
         selectInput(inputId = "x",
                     label = "Select x variable:",
                     choices = c("Date","Steps", "Sleep"),
-                    selected = "Steps"),
+                    selected = "Date"),
         selectInput(inputId = "y",
                     label = "Select y variable:",
                     choices = c("Steps", "Sleep"),
-                    selected = "Sleep")
+                    selected = "Steps")
       ),
       wellPanel(
          checkboxInput(inputId = "show_lm",
@@ -72,8 +72,8 @@ ui <- fluidPage(
     
     # Output(s)
     mainPanel(
-      p("As I wear my Fitbit activity tracker, I collect data on the number of steps I take each day (Steps) and the minutes I sleep each day (Sleep). In this plot I can see how well I slept during the month May and also how active I have been. Would these 2 variables influence each other? Let's find out..."),
-      p("Select the variables for the x-axis and y-axis and the plot will be created for you. Also you can add a linear model to the plot by checking the box."),
+      p("As I wear my Fitbit activity tracker, I collect data on the number of steps I take each day (Steps) and the minutes I sleep each day (Sleep). In this plot I can see how well I slept during the month May and also how active I have been. Would these 2 variables relate to each other? Let's find out..."),
+      p("Select the variables 'Steps' and 'Sleep' for the x-axis and y-axis and the plot will be created for you. Also you can add a linear model to the plot by checking the box."),
       plotOutput("plot")
     )
   )
@@ -86,7 +86,7 @@ server <- function(input, output) {
     
     # Create plot
     g <- ggplot(activity, aes_string(x = input$x, y = input$y)) +
-      geom_point() +
+      geom_point() + 
       labs(title = "My steps and/or sleep during May 2019")
     
     # Show plot with or without linear model
